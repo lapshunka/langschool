@@ -1,59 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
-
-Route::get('/about', function () {
-    return view('about', [
-        'fio' => 'Сулейменов Камал',
-        'group' => '3ПОВТ-24Б'             
-    ]);
-})->name('about');
-
-Route::get('/contacts', function () {
-    return view('contacts', [
-        'address' => 'г. Костанай, ул. Байтурсынова, 47',
-        'phone' => '+7 (7142) 55-00-00',
-        'email' => 'info@langschool.kz'
-    ]);
-})->name('contacts');
+Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
+Route::get('/rules', [PageController::class, 'rules'])->name('rules');
 
 Route::get('/hello/{name}', function (string $name) {
     return 'Здравствуйте, ' . $name . '! Добро пожаловать в Языковую школу.';
 });
 
-Route::get('/courses', function () {
-    return view('courses.index', ['items' => config('catalog.items')]);
-})->name('courses.index');
-
-Route::get('/courses/{id}', function (int $id) {
-    $item = config("catalog.items.$id");
-    if (! $item) {
-        abort(404);
-    }
-    return view('courses.show', ['id' => $id, 'item' => $item]);
-})->whereNumber('id')->name('courses.show');
-
-Route::view('/rules', 'rules')->name('rules');
+Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+Route::get('/courses/{id}', [CourseController::class, 'show'])
+    ->whereNumber('id')
+    ->name('courses.show');
 
 Route::redirect('/main', '/');
 
 Route::view('/booking', 'booking')->middleware('hours:9,18')->name('booking');
 
 Route::prefix('admin')->name('admin.')->middleware('admin.key')->group(function () {
-    Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('/', DashboardController::class)->name('dashboard');
 
-    Route::get('/courses', function () {
-        return view('admin.index', ['items' => config('catalog.items')]);
-    })->name('courses');
+    Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses');
+    Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
 
-    Route::view('/courses/create', 'admin.create')->name('courses.create');
-
-    Route::get('/logout', function () {
-        session()->forget('is_admin');
-        return redirect()->route('home');
-    })->name('logout');
+    Route::get('/logout', [DashboardController::class, 'logout'])->name('logout');
 });

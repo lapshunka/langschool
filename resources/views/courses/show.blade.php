@@ -1,22 +1,24 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ $item['title'] }} - {{ config('app.name') }}</title>
-</head>
-<body>
-    <nav>
-    <a href="{{ route('home') }}">Главная</a> |
-    <a href="{{ route('courses.index') }}">Курсы</a> |
-    <a href="{{ route('rules') }}">Правила</a> |
-    <a href="{{ route('booking') }}">Запись</a> |
-    <a href="{{ route('about') }}">О проекте</a> |
-    <a href="{{ route('contacts') }}">Контакты</a>
-</nav>
-    <h1>{{ $item['title'] }}</h1>
-    <p><strong>Уровень:</strong> {{ $item['level'] }}</p>
-    <p><strong>Стоимость:</strong> {{ $item['price'] }} тг</p>
-    
-    <p><a href="{{ route('courses.index') }}">← Назад к списку курсов</a></p>
-</body>
-</html>
+@extends('layouts.app')
+
+@section('title', 'Курс №' . $id . ' — ' . config('app.name'))
+
+@section('content')
+    <div class="card" style="border: 3px dashed #ff007f;">
+        <h1 style="color: #ff007f;">🎉 Курс: {{ $item['title'] ?? '№' . $id }}</h1>
+        
+        <p style="font-size: 1.1em; line-height: 1.6;">{{ $item['description'] ?? 'Подробная информация о языковом курсе.' }}</p>
+        
+        <div style="display: flex; gap: 20px; margin: 20px 0; background: #fff0f5; padding: 15px; border-radius: 10px;">
+            @if(isset($item['price']))
+                <div><strong>💰 Цена:</strong> <span style="color: #2e8b57; font-size: 1.2em;">{{ $item['price'] }} ₸</span></div>
+            @endif
+            @if(isset($item['duration']))
+                <div><strong>⏳ Длительность:</strong> {{ $item['duration'] }} часов чистой магии</div>
+            @endif
+        </div>
+
+        <p style="margin-top: 30px;">
+            <a href="{{ route('courses.index') }}" class="badge" style="background: #ff007f; color: white; padding: 8px 15px; text-decoration: none; border-radius: 20px;">← Назад к сумасшедшему каталогу</a>
+        </p>
+    </div>
+@endsection

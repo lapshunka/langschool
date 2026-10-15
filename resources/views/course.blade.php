@@ -1,16 +1,16 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Курс №{{ $id }} - {{ config('app.name') }}</title>
-</head>
-<body>
-    <nav>
-        <a href="{{ route('home') }}">Главная</a> |
-        <a href="{{ route('about') }}">О проекте</a> |
-        <a href="{{ route('contacts') }}">Контакты</a>
-    </nav>
-    <h1>Курс №{{ $id }}</h1>
-    <p>Подробная информация о языковом курсе под номером {{ $id }}. На этом курсе вы улучшите навыки разговорной речи и грамматики.</p>
-</body>
-</html>
+@extends('layouts.app')
+
+@section('title', 'Каталог курсов — ' . config('app.name'))
+
+@section('content')
+    <h1>Каталог курсов</h1>
+    @forelse ($items as $id => $item)
+        <div class="card">
+            <span class="badge">{{ $loop->iteration }}.</span>
+            <h2><a href="{{ route('courses.show', $id) }}">{{ $item['title'] ?? 'Курс #' . $id }}</a></h2>
+            <p>{{ $item['description'] ?? '' }}</p>
+        </div>
+    @empty
+        <p>Каталог пока пуст.</p>
+    @endforelse
+@endsection
