@@ -20,7 +20,7 @@
                         <td style="padding: 10px; border: 1px solid #cbd5e0;">{{ $item['title'] ?? 'Курс #' . $id }}</td>
                         <td style="padding: 10px; border: 1px solid #cbd5e0;">
                             @if($loop->first)
-                                <span class="badge" style="background-color: #c6f6d5; color: #22543d;">новая</span>
+                                <x-badge>новая</x-badge>
                             @else
                                 активна
                             @endif
