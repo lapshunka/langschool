@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\LanguageController; // <--- не забываем подключить контроллер языков
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
@@ -15,10 +16,14 @@ Route::get('/hello/{name}', function (string $name) {
     return 'Здравствуйте, ' . $name . '! Добро пожаловать в Языковую школу.';
 });
 
+// Каталог курсов
 Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
-Route::get('/courses/{id}', [CourseController::class, 'show'])
-    ->whereNumber('id')
-    ->name('courses.show');
+
+// Детальная страница курса (привязка модели через {course})
+Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
+
+// Страница конкретного языка (Задание 4)
+Route::get('/languages/{language}', [LanguageController::class, 'show'])->name('languages.show');
 
 Route::redirect('/main', '/');
 

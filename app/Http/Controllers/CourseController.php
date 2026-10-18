@@ -2,32 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Language;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class CourseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
+{
+    // Белый список для сортировки
+    $sort = in_array($request->sort, ['title', 'price', 'duration']) ? $request->sort : 'title';
+
+    $items = Course::with('language')
+        ->search($request->q)
+        ->when($request->language, fn ($q, $l) => $q->where('language_id', $l))
+        ->orderBy($sort)
+        ->paginate(9) // По 9 курсов на страницу
+        ->withQueryString(); // Сохраняет параметры ?q=... и ?language=... при переходе по страницам
+
+    $languages = Language::withCount('courses')->orderBy('name')->get();
+
+    return view('courses.index', compact('items', 'languages'));
+}
+
+    public function show(Course $course)
     {
-        $items = DB::table('courses')
-            ->join('languages', 'courses.language_id', '=', 'languages.id')
-            ->select('courses.*', 'languages.name as language_name')
-            ->orderBy('courses.title')
+        $relatedCourses = $course->language->courses()
+            ->where('id', '!=', $course->id)
+            ->take(3)
             ->get();
 
-        return view('courses.index', compact('items'));
-    }
-
-    public function show(int $id)
-    {
-        $item = DB::table('courses')
-            ->join('languages', 'courses.language_id', '=', 'languages.id')
-            ->select('courses.*', 'languages.name as language_name')
-            ->where('courses.id', $id)
-            ->first();
-
-        abort_if(!$item, 404);
-
-        return view('courses.show', compact('item'));
+        return view('courses.show', compact('course', 'relatedCourses'));
     }
 }
