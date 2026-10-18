@@ -32,8 +32,10 @@ Route::view('/booking', 'booking')->middleware('hours:9,18')->name('booking');
 Route::prefix('admin')->name('admin.')->middleware('admin.key')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
 
-    Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses');
-    Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
+    Route::resource('courses', AdminCourseController::class)->except('show');
+    
+    // Указываем полный класс с namespace для языков
+    Route::resource('languages', App\Http\Controllers\Admin\LanguageController::class)->except('show');
 
     Route::get('/logout', [DashboardController::class, 'logout'])->name('logout');
 });

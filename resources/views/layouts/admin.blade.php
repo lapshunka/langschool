@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Админ-панель — Языковая школа')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (session('success'))
+    <x-alert type="success">{{ session('success') }}</x-alert>
+@endif
+
+@if (session('error'))
+    <x-alert type="error">{{ session('error') }}</x-alert>
+@endif
 </head>
 <body class="admin-body">
     <div class="petals-container">
@@ -21,7 +28,8 @@
             <span class="logo" style="font-weight: bold; color: white;">Панель администратора</span>
             <nav class="menu">
                 <a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>Панель</a>
-                <a href="{{ route('admin.courses') }}" @class(['active' => request()->routeIs('admin.courses*')])>Курсы</a>
+                <a href="{{ route('admin.courses.index') }}" @class(['active' => request()->routeIs('admin.courses*')])>Курсы</a>
+                <a href="{{ route('admin.languages.index') }}" @class(['active' => request()->routeIs('admin.languages*')])>Языки</a>
                 <a href="{{ route('admin.logout') }}">Выход</a>
             </nav>
         </div>
