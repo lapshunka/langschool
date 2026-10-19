@@ -26,46 +26,54 @@
         }
     </style>
 
-    <div class="card">
+    <div class="card" style="overflow-x: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1>📚 Управление курсами</h1>
-            <a href="{{ route('admin.courses.create') }}" style="background: #2b6cb0; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none; font-weight: bold;">+ Добавить курс</a>
+            <a href="{{ route('admin.courses.create') }}" style="background: #2b6cb0; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; white-space: nowrap;">+ Добавить курс</a>
         </div>
 
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed;">
             <thead>
-                <tr style="background: #f7fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
-                    <th style="padding: 10px;">ID</th>
-                    <th style="padding: 10px;">Название</th>
-                    <th style="padding: 10px;">Язык</th>
-                    <th style="padding: 10px;">Цена</th>
-                    <th style="padding: 10px;">Длительность</th>
-                    <th style="padding: 10px;">Дата создания</th>
-                    <th style="padding: 10px; text-align: right;">Действия</th>
+                <tr style="background: #f7fafc; border-bottom: 2px solid #e2e8f0; text-align: left; font-size: 0.9em;">
+                    <th style="padding: 10px 8px; width: 6%;">ID</th>
+                    <th style="padding: 10px 8px; width: 22%;">Название</th>
+                    <th style="padding: 10px 8px; width: 14%;">Язык</th>
+                    <th style="padding: 10px 8px; width: 14%;">Автор</th>
+                    <th style="padding: 10px 8px; width: 12%;">Цена</th>
+                    <th style="padding: 10px 8px; width: 10%;">Длит.</th>
+                    <th style="padding: 10px 8px; width: 12%;">Дата</th>
+                    <th style="padding: 10px 8px; width: 10%; text-align: right;">Действия</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($items as $course)
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 10px;">{{ $course->id }}</td>
-                        <td style="padding: 10px; font-weight: bold;">{{ $course->title }}</td>
-                        <td style="padding: 10px;">{{ $course->language->name ?? 'Не указан' }}</td>
-                        <td style="padding: 10px;">{{ $course->price }} ₸</td>
-                        <td style="padding: 10px;">{{ $course->duration }} ч.</td>
-                        <td style="padding: 10px;">{{ $course->created_at->format('d.m.Y') }}</td>
-                        <td style="padding: 10px; text-align: right; display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-                            <a href="{{ route('admin.courses.edit', $course->id) }}" style="background: #d69e2e; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 0.85em;">Изменить</a>
-                            
-                            <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST" onsubmit="return confirm('Удалить этот курс?')" style="margin: 0;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" style="background: #e53e3e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em;">Удалить</button>
-                            </form>
+                    <tr style="border-bottom: 1px solid #e2e8f0; font-size: 0.9em;">
+                        <td style="padding: 10px 8px;">{{ $course->id }}</td>
+                        <td style="padding: 10px 8px; font-weight: bold; word-break: break-word;">{{ $course->title }}</td>
+                        <td style="padding: 10px 8px; word-break: break-word;">{{ $course->language->name ?? 'Не указан' }}</td>
+                        <td style="padding: 10px 8px; word-break: break-word;">{{ $course->user?->name ?? '—' }}</td>
+                        <td style="padding: 10px 8px; white-space: nowrap;">{{ $course->price }} ₸</td>
+                        <td style="padding: 10px 8px; white-space: nowrap;">{{ $course->duration }} ч.</td>
+                        <td style="padding: 10px 8px; white-space: nowrap;">{{ $course->created_at->format('d.m.Y') }}</td>
+                        <td style="padding: 10px 8px; text-align: right;">
+                            <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                                @can('update', $course)
+                                    <a href="{{ route('admin.courses.edit', $course->id) }}" style="background: #d69e2e; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 0.8em;">Изм.</a>
+                                @endcan
+                                
+                                @can('delete', $course)
+                                    <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST" onsubmit="return confirm('Удалить этот курс?')" style="margin: 0;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" style="background: #e53e3e; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8em;">Уд.</button>
+                                    </form>
+                                @endcan
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="padding: 20px; text-align: center; color: #718096;">Курсов пока нет.</td>
+                        <td colspan="8" style="padding: 20px; text-align: center; color: #718096;">Курсов пока нет.</td>
                     </tr>
                 @endforelse
             </tbody>

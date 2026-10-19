@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Удалили проблемную строчку defaultView, так как Laravel использует Tailwind из коробки
+        // Определяем Gate для доступа в админ-панель (доступно для admin и editor)
+        Gate::define('admin-panel', function (User $user) {
+            return in_array($user->role, ['admin', 'editor']);
+        });
 
         // Включаем защиту от ленивой загрузки (N+1) вне продакшна
         Model::preventLazyLoading(! app()->isProduction());

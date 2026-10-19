@@ -18,6 +18,7 @@ class Course extends Model
         'price',
         'is_active',
         'duration',
+        'user_id', // <--- Обязательно добавляем сюда
     ];
 
     protected function casts(): array
@@ -43,7 +44,12 @@ class Course extends Model
     {
         $query->when($text, function ($q) use ($text) {
             $q->where(fn ($w) => $w->where('title', 'like', "%{$text}%")
-                                  ->orWhere('description', 'like', "%{$text}%"));
+                                   ->orWhere('description', 'like', "%{$text}%"));
         });
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

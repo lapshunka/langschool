@@ -16,9 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\LogVisit::class,
         ]);
 
+        // Регистрируем алиас для проверки рабочих часов
         $middleware->alias([
-            'admin.key' => \App\Http\Middleware\CheckAdminKey::class,
-            'hours'     => \App\Http\Middleware\WorkingHours::class,
+            'hours' => \App\Http\Middleware\CheckHours::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -31,5 +31,26 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        
+        \App\Models\User::factory()->create([
+        'name' => 'Admin User',
+        'email' => 'admin@test.kz',
+        'password' => 'password',
+        'role' => 'admin',
+    ]);
+
+    \App\Models\User::factory()->create([
+        'name' => 'Editor User',
+        'email' => 'editor@test.kz',
+        'password' => 'password',
+        'role' => 'editor',
+    ]);
+
+    \App\Models\User::factory()->create([
+        'name' => 'Regular User',
+        'email' => 'user@test.kz',
+        'password' => 'password',
+        'role' => 'user',
+    ]);
     }
 }

@@ -6,17 +6,16 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WorkingHours
+class CheckHours
 {
-    public function handle(Request $request, Closure $next, string $from, string $to): Response
+    public function handle(Request $request, Closure $next, $start = 9, $end = 18): Response
     {
-        $currentHour = now()->hour;
+        $currentHour = (int) now()->format('G');
 
-        if ($currentHour < (int)$from || $currentHour >= (int)$to) {
-            return response()->view('closed', [
-                'from' => $from,
-                'to' => $to
-            ], 403);
+        // Если текущее время вне диапазона работы
+        if ($currentHour < $start || $currentHour >= $end) {
+            // Можно вернуть шаблон закрыто или ошибку
+            return response()->view('closed', [], 403);
         }
 
         return $next($request);

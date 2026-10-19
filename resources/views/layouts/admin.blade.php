@@ -6,12 +6,12 @@
     <title>@yield('title', 'Админ-панель — Языковая школа')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if (session('success'))
-    <x-alert type="success">{{ session('success') }}</x-alert>
-@endif
+        <x-alert type="success">{{ session('success') }}</x-alert>
+    @endif
 
-@if (session('error'))
-    <x-alert type="error">{{ session('error') }}</x-alert>
-@endif
+    @if (session('error'))
+        <x-alert type="error">{{ session('error') }}</x-alert>
+    @endif
 </head>
 <body class="admin-body">
     <div class="petals-container">
@@ -24,13 +24,22 @@
     </div>
 
     <header class="site-header" style="background: linear-gradient(135deg, #7b1fa2, #512da8);">
-        <div class="container header-flex">
+        <div class="container header-flex" style="display: flex; justify-content: space-between; align-items: center;">
             <span class="logo" style="font-weight: bold; color: white;">Панель администратора</span>
-            <nav class="menu">
+            <nav class="menu" style="display: flex; align-items: center; gap: 10px;">
                 <a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>Панель</a>
                 <a href="{{ route('admin.courses.index') }}" @class(['active' => request()->routeIs('admin.courses*')])>Курсы</a>
                 <a href="{{ route('admin.languages.index') }}" @class(['active' => request()->routeIs('admin.languages*')])>Языки</a>
-                <a href="{{ route('admin.logout') }}">Выход</a>
+                
+                {{-- Информация о текущем пользователе и кнопка выхода через POST --}}
+                @auth
+                    <span style="color: #e2e8f0; font-size: 0.9em; margin-left: 10px;">{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
+                    <a href="{{ route('courses.index') }}" style="color: #fff; text-decoration: underline;">Сайт</a>
+                    <form action="{{ route('logout') }}" method="POST" style="display: inline; margin: 0;">
+                        @csrf
+                        <button type="submit" style="background: #e53e3e; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font: inherit; font-size: 0.9em;">Выход</button>
+                    </form>
+                @endauth
             </nav>
         </div>
     </header>

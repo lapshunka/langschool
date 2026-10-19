@@ -3,28 +3,30 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Course;
 
 class StoreCourseRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Разрешаем выполнение запроса
+        // Проверяем права на создание курса через Policy
+        return $this->user()->can('create', Course::class);
     }
 
     protected function prepareForValidation(): void
     {
-        // Превращаем чекбокс в boolean (true/false), чтобы он корректно обрабатывался[cite: 5]
+        // Превращаем чекбокс в boolean (true/false), чтобы он корректно обрабатывался
         $this->merge(['is_active' => $this->boolean('is_active')]);
     }
 
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255', 'unique:courses,title'], // уникальное название[cite: 5]
-            'language_id' => ['required', 'exists:languages,id'], // проверка существования языка[cite: 5]
+            'title' => ['required', 'string', 'max:255', 'unique:courses,title'],
+            'language_id' => ['required', 'exists:languages,id'],
             'description' => ['nullable', 'string', 'max:2000'],
-            'price' => ['required', 'numeric', 'between:0,1000000'], // диапазон цены[cite: 5]
-            'duration' => ['required', 'integer', 'between:1,500'], // диапазон длительности
+            'price' => ['required', 'numeric', 'between:0,1000000'],
+            'duration' => ['required', 'integer', 'between:1,500'],
             'is_active' => ['boolean'],
         ];
     }
@@ -37,7 +39,7 @@ class StoreCourseRequest extends FormRequest
             'language_id.exists' => 'Выбранный язык обучения не найден.',
             'price.between' => 'Цена должна находиться в диапазоне от :min до :max ₸.',
             'duration.between' => 'Длительность должна составлять от :min до :max часов.',
-        ]; // Русские сообщения (минимум 5 штук)[cite: 5]
+        ];
     }
 
     public function attributes(): array
@@ -49,6 +51,6 @@ class StoreCourseRequest extends FormRequest
             'price' => 'цена',
             'duration' => 'длительность',
             'is_active' => 'активность',
-        ]; // Человеческие названия полей[cite: 5]
+        ];
     }
 }
