@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Course extends Model
 {
@@ -18,7 +19,9 @@ class Course extends Model
         'price',
         'is_active',
         'duration',
-        'user_id', // <--- Обязательно добавляем сюда
+        'user_id',
+        'cover',
+        'attachment',
     ];
 
     protected function casts(): array
@@ -28,6 +31,14 @@ class Course extends Model
             'price' => 'decimal:2',
             'duration' => 'integer',
         ];
+    }
+
+    // Аксессор для получения URL обложки или заглушки (Задание 2)
+    protected function coverUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->cover
+            ? asset('storage/' . $this->cover)
+            : asset('images/no-cover.png'));
     }
 
     public function language(): BelongsTo

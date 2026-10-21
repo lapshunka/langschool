@@ -9,7 +9,6 @@ class UpdateCourseRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Проверяем права на редактирование конкретной записи курса через Policy
         return $this->user()->can('update', $this->route('course'));
     }
 
@@ -21,7 +20,6 @@ class UpdateCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Игнорируем текущую запись при проверке уникальности имени
             'title' => [
                 'required', 
                 'string', 
@@ -33,6 +31,8 @@ class UpdateCourseRequest extends FormRequest
             'price' => ['required', 'numeric', 'between:0,1000000'],
             'duration' => ['required', 'integer', 'between:1,500'],
             'is_active' => ['boolean'],
+            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:10240'], // <--- ДОБАВЛЕНО
         ];
     }
 
@@ -44,6 +44,8 @@ class UpdateCourseRequest extends FormRequest
             'language_id.exists' => 'Выбранный язык обучения не найден.',
             'price.between' => 'Цена должна находиться в диапазоне от :min до :max ₸.',
             'duration.between' => 'Длительность должна составлять от :min до :max часов.',
+            'attachment.mimes' => 'Файл программы должен быть формата PDF.',
+            'attachment.max' => 'Размер PDF-файла не должен превышать 10 МБ.',
         ];
     }
 
@@ -56,6 +58,8 @@ class UpdateCourseRequest extends FormRequest
             'price' => 'цена',
             'duration' => 'длительность',
             'is_active' => 'активность',
+            'cover' => 'обложка',
+            'attachment' => 'программа курса (PDF)', // <--- ДОБАВЛЕНО
         ];
     }
 }

@@ -29,10 +29,18 @@ Route::get('/hello/{name}', function (string $name) {
     return 'Здравствуйте, ' . $name . '! Добро пожаловать в Языковую школу.';
 });
 
-// Каталог курсов
+// --- КАТАЛОГ И СПЕЦИФИЧНЫЕ МАРШРУТЫ КУРСОВ ---
 Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
 
-// Детальная страница курса
+// 📄 Маршрут генерации PDF (ОБЯЗАТЕЛЬНО выше чем /courses/{course})[cite: 3]
+Route::get('/courses/pdf', [CourseController::class, 'pdf'])->name('courses.pdf');
+
+// Защищенный маршрут скачивания файла программы курса (Задание 4)
+Route::get('/courses/{course}/attachment', [CourseController::class, 'downloadAttachment'])
+    ->name('courses.attachment')
+    ->middleware('auth');
+
+// Детальная страница курса (с параметром — должна идти ниже статических путей вроде /pdf)
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
 
 // Страница конкретного языка

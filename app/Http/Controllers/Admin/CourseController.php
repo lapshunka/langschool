@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
@@ -27,8 +28,19 @@ class CourseController extends Controller
 
     public function store(StoreCourseRequest $request)
     {
-        // Создаем курс и привязываем автора (user_id)
-        Course::create($request->validated() + ['user_id' => $request->user()->id]);
+        $data = $request->validated();
+
+        // Если файл обложки передан, сохраняем его в storage/app/public/covers
+        if ($request->hasFile('cover')) {
+            $data['cover'] = $request->file('cover')->store('covers', 'public');
+        }
+
+        // Если файл вложения (PDF) передан, сохраняем его в storage/app/attachments
+        if ($request->hasFile('attachment')) {
+            $data['attachment'] = $request->file('attachment')->store('attachments');
+        }
+
+        Course::create($data + ['user_id' => $request->user()->id]);
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Курс успешно добавлен!');
@@ -44,8 +56,37 @@ class CourseController extends Controller
 
     public function update(UpdateCourseRequest $request, Course $course)
     {
-        // Авторизация проверяется автоматически в UpdateCourseRequest через Policy
-        $course->update($request->validated());
+        $data = $request->validated();
+
+        // Если загружена новая картинка
+        if ($request->hasFile('cover')) {
+            if ($course->cover) {
+                Storage::disk('public')->delete($course->cover);
+            }
+            $data['cover'] = $request->file('cover')->store('covers', 'public');
+        } 
+        elseif ($request->boolean('remove_cover')) {
+            if ($course->cover) {
+                Storage::disk('public')->delete($course->cover);
+            }
+            $data['cover'] = null;
+        }
+
+        // Если загружен новый PDF-файл
+        if ($request->hasFile('attachment')) {
+            if ($course->attachment) {
+                Storage::delete($course->attachment);
+            }
+            $data['attachment'] = $request->file('attachment')->store('attachments');
+        } 
+        elseif ($request->boolean('remove_attachment')) {
+            if ($course->attachment) {
+                Storage::delete($course->attachment);
+            }
+            $data['attachment'] = null;
+        }
+
+        $course->update($data);
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Изменения сохранены!');
@@ -54,6 +95,14 @@ class CourseController extends Controller
     public function destroy(Course $course)
     {
         Gate::authorize('delete', $course);
+
+        // Удаляем файлы с диска при удалении курса
+        if ($course->cover) {
+            Storage::disk('public')->delete($course->cover);
+        }
+        if ($course->attachment) {
+            Storage::delete($course->attachment);
+        }
 
         $course->delete();
 

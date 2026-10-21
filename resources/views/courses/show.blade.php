@@ -3,12 +3,17 @@
 @section('title', 'Курс: ' . $course->title . ' — ' . config('app.name'))
 
 @section('content')
-    <div class="card" style="border: 3px dashed #ff007f;">
+    <div class="card" style="border: 3px dashed #ff007f; overflow: hidden;">
+        <!-- Крупное изображение (Задание 3) -->
+        <div style="margin: -20px -20px 20px -20px;">
+            <img src="{{ $course->cover_url }}" alt="{{ $course->title }}" style="width: 100%; height: 320px; object-fit: cover;">
+        </div>
+
         <h1 style="color: #ff007f;">🎉 Курс: {{ $course->title }}</h1>
         
         <p style="font-size: 1.1em; line-height: 1.6;">{{ $course->description }}</p>
         
-        <!-- Ссылка на страницу языка (Задание 4) -->
+        <!-- Ссылка на страницу языка -->
         <p style="font-size: 1.05em; color: #7b1fa2; margin: 10px 0;">
             <strong>📚 Изучаемый язык:</strong> 
             <a href="{{ route('languages.show', $course->language->id) }}" style="color: #7b1fa2; font-weight: bold;">
@@ -16,9 +21,41 @@
             </a>
         </p>
         
-        <div style="display: flex; gap: 20px; margin: 20px 0; background: #fff0f5; padding: 15px; border-radius: 10px;">
+        <div style="display: flex; gap: 20px; margin: 20px 0; background: #fff0f5; padding: 15px; border-radius: 10px; flex-wrap: wrap;">
             <div><strong>💰 Цена:</strong> <span style="color: #2e8b57; font-size: 1.2em;">{{ $course->price }} ₸</span></div>
             <div><strong>⏳ Длительность:</strong> {{ $course->duration }} часов чистой магии</div>
+        </div>
+
+        <!-- Блок закрытого PDF-документа (Задание 4) -->
+        <div style="margin: 25px 0; padding: 20px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <h3 style="margin-top: 0; color: #2d3748;">📄 Программа курса (PDF)</h3>
+            
+            @auth
+                @if ($course->attachment)
+                    <p>Документ доступен вам как авторизованному пользователю:</p>
+                    <a href="{{ route('courses.attachment', $course->id) }}" style="display: inline-block; background: #2b6cb0; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                        📥 Скачать программу курса
+                    </a>
+                @else
+                    <p style="color: #718096; margin: 0;">Для этого курса пока не загружена программа в формате PDF.</p>
+                @endif
+            @else
+                <p style="color: #718096; margin-bottom: 10px;">🔒 Программа курса доступна только зарегистрированным пользователям.</p>
+                <div>
+                    <a href="{{ route('login') }}" style="color: #2b6cb0; font-weight: bold; text-decoration: underline;">Войдите в систему</a> или <a href="{{ route('register') }}" style="color: #2b6cb0; font-weight: bold; text-decoration: underline;">зарегистрируйтесь</a>, чтобы скачать файл.
+                </div>
+            @endauth
+        </div>
+
+        <!-- Блок QR-кода для мобильных устройств (Задание 7) -->
+        <div style="margin: 25px 0; padding: 20px; background: #fdf2f8; border-radius: 8px; border: 1px solid #fbb6ce; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; display: inline-block;">
+                {!! QrCode::size(110)->generate(route('courses.show', $course->id)) !!}
+            </div>
+            <div>
+                <h4 style="margin: 0 0 5px 0; color: #db2777;">📱 Быстрый доступ</h4>
+                <p style="margin: 0; font-size: 0.9em; color: #4a5568;">Сканируйте QR-код камерой смартфона, чтобы открыть этот курс на мобильном устройстве.</p>
+            </div>
         </div>
 
         <!-- Блок «Ещё из этой категории» -->

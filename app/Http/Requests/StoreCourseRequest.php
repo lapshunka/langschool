@@ -9,13 +9,11 @@ class StoreCourseRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Проверяем права на создание курса через Policy
         return $this->user()->can('create', Course::class);
     }
 
     protected function prepareForValidation(): void
     {
-        // Превращаем чекбокс в boolean (true/false), чтобы он корректно обрабатывался
         $this->merge(['is_active' => $this->boolean('is_active')]);
     }
 
@@ -28,6 +26,8 @@ class StoreCourseRequest extends FormRequest
             'price' => ['required', 'numeric', 'between:0,1000000'],
             'duration' => ['required', 'integer', 'between:1,500'],
             'is_active' => ['boolean'],
+            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:10240'], // <--- ДОБАВЛЕНО
         ];
     }
 
@@ -39,6 +39,8 @@ class StoreCourseRequest extends FormRequest
             'language_id.exists' => 'Выбранный язык обучения не найден.',
             'price.between' => 'Цена должна находиться в диапазоне от :min до :max ₸.',
             'duration.between' => 'Длительность должна составлять от :min до :max часов.',
+            'attachment.mimes' => 'Файл программы должен быть формата PDF.',
+            'attachment.max' => 'Размер PDF-файла не должен превышать 10 МБ.',
         ];
     }
 
@@ -51,6 +53,8 @@ class StoreCourseRequest extends FormRequest
             'price' => 'цена',
             'duration' => 'длительность',
             'is_active' => 'активность',
+            'cover' => 'обложка',
+            'attachment' => 'программа курса (PDF)', // <--- ДОБАВЛЕНО
         ];
     }
 }

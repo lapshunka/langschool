@@ -64,9 +64,11 @@
             </div>
 
             <!-- Кнопки -->
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button type="submit" style="background: #2b6cb0; color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">Найти</button>
                 <a href="{{ route('courses.index') }}" style="background: #e2e8f0; color: #4a5568; border: none; padding: 9px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center;">Сбросить</a>
+                <!-- Кнопка скачивания PDF (Задание 6) -->
+                <a href="{{ route('courses.pdf', request()->query()) }}" style="background: #2f9e66; color: white; padding: 9px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center;">📄 Скачать PDF</a>
             </div>
         </form>
 
@@ -100,6 +102,7 @@
             <x-card 
                 :title="$item->title ?? 'Курс'" 
                 :url="route('courses.show', $item->id)" 
+                :image="$item->cover_url"
                 :badge="$badgeText">
                 
                 <p style="margin: 5px 0; color: #444;">{{ $item->description ?? 'Интересный курс для прокачки мозгов.' }}</p>

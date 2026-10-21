@@ -35,13 +35,14 @@
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed;">
             <thead>
                 <tr style="background: #f7fafc; border-bottom: 2px solid #e2e8f0; text-align: left; font-size: 0.9em;">
-                    <th style="padding: 10px 8px; width: 6%;">ID</th>
-                    <th style="padding: 10px 8px; width: 22%;">Название</th>
-                    <th style="padding: 10px 8px; width: 14%;">Язык</th>
-                    <th style="padding: 10px 8px; width: 14%;">Автор</th>
-                    <th style="padding: 10px 8px; width: 12%;">Цена</th>
+                    <th style="padding: 10px 8px; width: 5%;">ID</th>
+                    <th style="padding: 10px 8px; width: 10%;">Обложка</th>
+                    <th style="padding: 10px 8px; width: 20%;">Название</th>
+                    <th style="padding: 10px 8px; width: 12%;">Язык</th>
+                    <th style="padding: 10px 8px; width: 12%;">Автор</th>
+                    <th style="padding: 10px 8px; width: 11%;">Цена</th>
                     <th style="padding: 10px 8px; width: 10%;">Длит.</th>
-                    <th style="padding: 10px 8px; width: 12%;">Дата</th>
+                    <th style="padding: 10px 8px; width: 10%;">Дата</th>
                     <th style="padding: 10px 8px; width: 10%; text-align: right;">Действия</th>
                 </tr>
             </thead>
@@ -49,6 +50,9 @@
                 @forelse ($items as $course)
                     <tr style="border-bottom: 1px solid #e2e8f0; font-size: 0.9em;">
                         <td style="padding: 10px 8px;">{{ $course->id }}</td>
+                        <td style="padding: 10px 8px;">
+                            <img src="{{ $course->cover_url }}" alt="{{ $course->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                        </td>
                         <td style="padding: 10px 8px; font-weight: bold; word-break: break-word;">{{ $course->title }}</td>
                         <td style="padding: 10px 8px; word-break: break-word;">{{ $course->language->name ?? 'Не указан' }}</td>
                         <td style="padding: 10px 8px; word-break: break-word;">{{ $course->user?->name ?? '—' }}</td>
@@ -73,7 +77,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="padding: 20px; text-align: center; color: #718096;">Курсов пока нет.</td>
+                        <td colspan="9" style="padding: 20px; text-align: center; color: #718096;">Курсов пока нет.</td>
                     </tr>
                 @endforelse
             </tbody>
