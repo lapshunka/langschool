@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Contracts\SmsSender;
+use App\Services\Sms\LogSmsSender;
+use App\Services\Sms\NullSmsSender;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +18,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Привязка интерфейса SmsSender в сервис-контейнере (Задание 3)
+        $this->app->singleton(SmsSender::class, function () {
+            return match (config('services.sms.driver')) {
+                'log'   => new LogSmsSender(),
+                default => new NullSmsSender(),
+            };
+        });
     }
 
     /**

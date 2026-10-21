@@ -15,16 +15,27 @@
                 <a href="{{ route('register') }}" @class(['active' => request()->routeIs('register')]) style="color: white; text-decoration: none; margin-left: 15px; padding: 5px 10px; border-radius: 4px; background: rgba(255,255,255,0.3);">Регистрация</a>
             @endguest
 
-            {{-- Для авторизованного пользователя[cite: 3] --}}
+            {{-- Для авторизованного пользователя --}}
             @auth
-                <span style="color: #f7fafc; font-weight: bold; margin-left: 15px;">{{ auth()->user()->name }}</span>
-                
-                {{-- Если у пользователя есть права администратора или редактора[cite: 3] --}}
+                {{-- Ссылка на профиль (ЛР9, Задание 2) --}}
+                <a href="{{ route('profile') }}" @class(['active' => request()->routeIs('profile')]) style="color: white; text-decoration: none; margin-left: 15px; padding: 5px 10px; border-radius: 4px; background: rgba(255,255,255,0.1);"> Профиль</a>
+
+                {{-- Колокольчик уведомлений для администратора (ЛР9, Задание 5) --}}
                 @can('admin-panel')
+                    <a href="{{ route('admin.notifications') }}" style="color: white; text-decoration: none; margin-left: 15px; padding: 5px 10px; border-radius: 4px; background: #2c5282; position: relative;">
+                        🔔 
+                        @if(auth()->user()->unreadNotifications->count() > 0)
+                            <span style="background: #e53e3e; color: white; border-radius: 999px; padding: 1px 6px; font-size: 0.75em; font-weight: bold;">
+                                {{ auth()->user()->unreadNotifications->count() }}
+                            </span>
+                        @endif
+                    </a>
                     <a href="{{ route('admin.dashboard') }}" style="color: white; text-decoration: none; margin-left: 15px; padding: 5px 10px; border-radius: 4px; background: #d69e2e;">Админ-панель</a>
                 @endcan
 
-                {{-- Кнопка выхода (обязательно через POST-форму для защиты от CSRF)[cite: 3] --}}
+                <span style="color: #f7fafc; font-weight: bold; margin-left: 15px;">{{ auth()->user()->name }}</span>
+
+                {{-- Кнопка выхода (через POST-форму для защиты от CSRF) --}}
                 <form action="{{ route('logout') }}" method="POST" style="display: inline; margin-left: 15px;">
                     @csrf
                     <button type="submit" style="background: #e53e3e; border: none; color: white; cursor: pointer; padding: 5px 10px; border-radius: 4px; font: inherit; font-weight: bold;">Выйти</button>

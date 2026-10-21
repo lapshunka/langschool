@@ -11,6 +11,12 @@
 
         <h1 style="color: #ff007f;">🎉 Курс: {{ $course->title }}</h1>
         
+        @if (session('success'))
+            <div style="margin: 15px 0; padding: 15px; background: #def7ec; color: #03543f; border: 1px solid #84e1bc; border-radius: 8px; font-weight: bold;">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <p style="font-size: 1.1em; line-height: 1.6;">{{ $course->description }}</p>
         
         <!-- Ссылка на страницу языка -->
@@ -26,7 +32,42 @@
             <div><strong>⏳ Длительность:</strong> {{ $course->duration }} часов чистой магии</div>
         </div>
 
-        <!-- Блок закрытого PDF-документа (Задание 4) -->
+        <!-- Блок формы записи на пробный урок (ЛР9, Задание 2) -->
+        <div style="margin: 25px 0; padding: 20px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+            <h3 style="margin-top: 0; color: #166534;">🎯 Записаться на пробный урок</h3>
+            
+            @auth
+                <form action="{{ route('courses.bookings.store', $course->id) }}" method="POST">
+                    @csrf
+                    <div style="margin-bottom: 12px;">
+                        <label for="phone" style="display: block; font-weight: bold; margin-bottom: 5px; color: #166534;">Телефон (+7XXXXXXXXXX):</label>
+                        <input type="text" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+77011234567" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; box-sizing: border-box;">
+                        @error('phone')
+                            <div style="color: #e53e3e; font-size: 0.85em; margin-top: 4px;">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <label for="comment" style="display: block; font-weight: bold; margin-bottom: 5px; color: #166534;">Комментарий:</label>
+                        <textarea id="comment" name="comment" rows="3" placeholder="Удобное время или вопросы..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; box-sizing: border-box;">{{ old('comment') }}</textarea>
+                        @error('comment')
+                            <div style="color: #e53e3e; font-size: 0.85em; margin-top: 4px;">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <button type="submit" style="background: #16a34a; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                        Отправить заявку
+                    </button>
+                </form>
+            @else
+                <p style="color: #718096; margin-bottom: 10px;">🔒 Записаться на пробный урок могут только зарегистрированные пользователи.</p>
+                <div>
+                    <a href="{{ route('login') }}" style="color: #2b6cb0; font-weight: bold; text-decoration: underline;">Войдите в систему</a> или <a href="{{ route('register') }}" style="color: #2b6cb0; font-weight: bold; text-decoration: underline;">зарегистрируйтесь</a>, чтобы оставить заявку.
+                </div>
+            @endauth
+        </div>
+
+        <!-- Блок закрытого PDF-документа (Задание 4 из ЛР8) -->
         <div style="margin: 25px 0; padding: 20px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
             <h3 style="margin-top: 0; color: #2d3748;">📄 Программа курса (PDF)</h3>
             
@@ -47,7 +88,7 @@
             @endauth
         </div>
 
-        <!-- Блок QR-кода для мобильных устройств (Задание 7) -->
+        <!-- Блок QR-кода для мобильных устройств (Задание 7 из ЛР8) -->
         <div style="margin: 25px 0; padding: 20px; background: #fdf2f8; border-radius: 8px; border: 1px solid #fbb6ce; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
             <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; display: inline-block;">
                 {!! QrCode::size(110)->generate(route('courses.show', $course->id)) !!}
