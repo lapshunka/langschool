@@ -56,3 +56,17 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## API (Раздел для ЛР №12)
+
+Версионированный REST API для чтения каталога языковой школы.
+
+| Метод | Адрес | Параметры | Описание | Коды ответа |
+| :--- | :--- | :--- | :--- | :--- |
+| GET | `/api/v1/ping` | — | Проверка работы API | 200 |
+| GET | `/api/v1/stats` | — | Статистика курсов и языков | 200 |
+| GET | `/api/v1/courses/random` | — | Один случайный курс в наличии | 200, 404 |
+| GET | `/api/v1/courses` | `q`, `language`, `sort`, `per_page` | Список курсов с фильтрами, сортировкой и пагинацией | 200, 422 |
+| GET | `/api/v1/courses/{id}` | — | Подробная информация об одном курсе | 200, 404 |
+| GET | `/api/v1/languages` | — | Список всех языков с подсчетом курсов | 200 |
+| GET | `/api/v1/languages/{language}/courses` | `per_page` | Курсы конкретного языка с пагинацией | 200, 404 |
