@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use Illuminate\Support\Facades\Storage;
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
@@ -84,4 +85,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin-panel'])-
 
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/read', [AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
+
+    // Фоновый PDF-каталог и скачивание (ЛР10, Задание 4)
+    Route::post('/exports/generate', function (Illuminate\Http\Request $request) {
+        \App\Jobs\GenerateCatalogPdf::dispatch($request->user());
+        return back()->with('success', 'Каталог формируется, вы получите уведомление.');
+    })->name('exports.generate');
+
+    Route::get('/exports/{file}', function (string $file) {
+        $path = "exports/{$file}";
+        if (!Storage::exists($path)) {
+            abort(404, 'Файл каталога не найден.');
+        }
+        return Storage::download($path);
+    })->name('exports.download');
 });

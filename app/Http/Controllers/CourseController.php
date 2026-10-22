@@ -4,16 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Language;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Requests\StoreBookingRequest;
 use App\Services\BookingService;
-use App\Mail\BookingReceived;
-use App\Notifications\NewBooking;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
+use App\Events\BookingCreated;
 
 class CourseController extends Controller
 {
@@ -73,12 +69,8 @@ class CourseController extends Controller
     {
         $booking = $service->create($request->user(), $course, $request->validated());
 
-        // Отправка письма пользователю (Задание 4)
-        Mail::to($request->user())->send(new BookingReceived($booking));
-
-        // Отправка уведомления всем администраторам (Задание 5)
-        $admins = User::where('role', 'admin')->get();
-        Notification::send($admins, new NewBooking($booking));
+        // Объявляем событие (Задание 1)
+        BookingCreated::dispatch($booking);
 
         return back()->with('success', "Заявка №{$booking->id} успешно отправлена!");
     }

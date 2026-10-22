@@ -2,16 +2,14 @@
 
 namespace App\Services;
 
-use App\Contracts\SmsSender;
 use App\Models\Course;
 use App\Models\Booking;
 use App\Models\User;
+use App\Jobs\RemindAboutBooking;
 use Illuminate\Validation\ValidationException;
 
 class BookingService
 {
-    public function __construct(private SmsSender $sms) {}
-
     public function create(User $user, Course $course, array $data): Booking
     {
         $activeCount = $user->bookings()->where('status', 'new')->count();
@@ -39,8 +37,8 @@ class BookingService
             'status' => 'new',
         ]);
 
-        // Отправка SMS через внедрённый через контейнер сервис
-        $this->sms->send($data['phone'], "Заявка №{$booking->id} принята");
+        // Диспетчеризация отложенной задачи напоминания (Задание 5)
+        RemindAboutBooking::dispatch($booking)->delay(now()->addMinute());
 
         return $booking;
     }

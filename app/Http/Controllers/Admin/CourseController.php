@@ -96,14 +96,7 @@ class CourseController extends Controller
     {
         Gate::authorize('delete', $course);
 
-        // Удаляем файлы с диска при удалении курса
-        if ($course->cover) {
-            Storage::disk('public')->delete($course->cover);
-        }
-        if ($course->attachment) {
-            Storage::delete($course->attachment);
-        }
-
+        // Удаление файлов делегировано наблюдателю CourseObserver (Задание 2)
         $course->delete();
 
         return back()->with('success', 'Курс удален!');
