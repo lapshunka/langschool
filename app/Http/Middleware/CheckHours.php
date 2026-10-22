@@ -14,8 +14,11 @@ class CheckHours
 
         // Если текущее время вне диапазона работы
         if ($currentHour < $start || $currentHour >= $end) {
-            // Можно вернуть шаблон закрыто или ошибку
-            return response()->view('closed', [], 403);
+            // Передаем переменные $from и $to в шаблон closed
+            return response()->view('closed', [
+                'from' => sprintf('%02d:00', $start),
+                'to' => sprintf('%02d:00', $end),
+            ], 403);
         }
 
         return $next($request);

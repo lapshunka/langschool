@@ -46,8 +46,8 @@
                 <select id="language" name="language" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; background: #fff;">
                     <option value="">Все языки</option>
                     @foreach($languages as $lang)
-                        <option value="{{ $lang->id }}" @selected(request('language') == $lang->id)>
-                            {{ $lang->name }}
+                        <option value="{{ $lang['id'] }}" @selected(request('language') == $lang['id'])>
+                            {{ $lang['name'] }}
                         </option>
                     @endforeach
                 </select>
@@ -78,10 +78,10 @@
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px;">
                 @foreach($languages as $lang)
                     <li>
-                        <a href="{{ route('languages.show', $lang->id) }}" style="background: #fff; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 20px; text-decoration: none; color: #2b6cb0; display: inline-block; font-size: 0.9em;">
-                            {{ $lang->name }} 
+                        <a href="{{ route('languages.show', $lang['id']) }}" style="background: #fff; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 20px; text-decoration: none; color: #2b6cb0; display: inline-block; font-size: 0.9em;">
+                            {{ $lang['name'] }} 
                             <span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 0.85em;">
-                                {{ $lang->courses_count }}
+                                {{ $lang['courses_count'] }}
                             </span>
                         </a>
                     </li>
@@ -109,7 +109,7 @@
                 
                 <p style="margin: 5px 0; font-size: 0.9em; color: #7b1fa2;">
                     <strong>📚 Язык:</strong> 
-                    <a href="{{ route('languages.show', $item->language->id) }}" style="color: #7b1fa2; text-decoration: none;">
+                    <a href="{{ route('languages.show', $item->language->id ?? 1) }}" style="color: #7b1fa2; text-decoration: none;">
                         {{ $item->language->name ?? 'Не указан' }}
                     </a>
                 </p>

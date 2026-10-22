@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Requests\StoreBookingRequest;
 use App\Services\BookingService;
@@ -16,23 +17,26 @@ class CourseController extends Controller
     public function index(Request $request)
     {
         // Белый список для сортировки
-        $sort = in_array($request->sort, ['title', 'price', 'duration']) ? $request->sort : 'title';
+        $sort = in_array($request->sort, ['title', 'price', 'duration']) ?$request->sort : 'title';
 
         $items = Course::with('language')
             ->search($request->q)
-            ->when($request->language, fn ($q, $l) => $q->where('language_id', $l))
+            ->when($request->language, fn ($q,$l) => $q->where('language_id',$l))
             ->orderBy($sort)
             ->paginate(9) // По 9 курсов на страницу
             ->withQueryString(); // Сохраняет параметры ?q=... и ?language=... при переходе по страницам
 
-        $languages = Language::withCount('courses')->orderBy('name')->get();
+        // Кэшируем меню языков в виде чистого массива под новым надежным ключом
+        $languages = Cache::store('file')->remember('languages.menu.final', now()->addHour(), function () {
+            return Language::withCount('courses')->orderBy('name')->get()->toArray();
+        });
 
         return view('courses.index', compact('items', 'languages'));
     }
 
     public function show(Course $course)
     {
-        $relatedCourses = $course->language->courses()
+        $relatedCourses =$course->language->courses()
             ->where('id', '!=', $course->id)
             ->take(3)
             ->get();
@@ -55,7 +59,7 @@ class CourseController extends Controller
         // Получаем отфильтрованный список курсов для PDF
         $courses = Course::with('language')
             ->search($request->q)
-            ->when($request->language, fn ($q, $l) => $q->where('language_id', $l))
+            ->when($request->language, fn ($q,$l) => $q->where('language_id',$l))
             ->orderBy('title')
             ->get();
 
@@ -65,9 +69,9 @@ class CourseController extends Controller
         return $pdf->download('courses-catalog-' . now()->format('Y-m-d') . '.pdf');
     }
 
-    public function storeBooking(StoreBookingRequest $request, Course $course, BookingService $service)
+    public function storeBooking(StoreBookingRequest $request, Course $course, BookingService$service)
     {
-        $booking = $service->create($request->user(), $course, $request->validated());
+        $booking = $service->create($request->user(), $course,$request->validated());
 
         // Объявляем событие (Задание 1)
         BookingCreated::dispatch($booking);

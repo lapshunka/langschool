@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Course;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class CourseObserver
 {
@@ -19,11 +20,25 @@ class CourseObserver
         Log::info("Изменен курс #{$course->id}: {$changes}");
     }
 
+    // Сброс кэша при сохранении (создании или обновлении) курса (Задание 5)
+    public function saved(Course $course): void
+    {
+        Cache::forget('home.stats');
+        Cache::forget('admin.stats');
+    }
+
     public function deleting(Course $course): void
     {
         // Удаляем прикрепленный файл программы курса, если он есть
         if ($course->attachment && Storage::exists($course->attachment)) {
             Storage::delete($course->attachment);
         }
+    }
+
+    // Сброс кэша при удалении курса (Задание 5)
+    public function deleted(Course $course): void
+    {
+        Cache::forget('home.stats');
+        Cache::forget('admin.stats');
     }
 }
